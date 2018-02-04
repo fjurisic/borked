@@ -1,3 +1,5 @@
+### Introduction:
+
 Data science projects are messy (in my experience), and making sense of what was done, how it was done and where parts of it are is not simple.
 `borked` is a concept proposal and (some day) quality-of-life tools for a graph based way of tracking work done.
 
@@ -9,8 +11,6 @@ Below is an imaginary project visualisation that demonstrates the basic idea. It
 * experiments, data pipelines, new data, collaboration, bugs, etc. quickly make the best laid plans fall apart
 
 The whole idea is to alleviate the trouble from the final point. The main focus is on a compact overview and dependencies tracking, which should hopefully aid reproducibility and help ensure you are using latest data/models/tools when experimenting.
-
-[](![alt text](https://github.com/fjurisic/borked/raw/master/example/example.png "borked graph"))
 
 ![alt text](example/example.png "borked graph")
 
@@ -63,3 +63,6 @@ Work planned:
 * add ability to plot only subgraph leading to one node of interest, for dependency inspection
 * add ability for chronological ranking of nodes for better insight in work progress
 * add more concepts and ideas for better saliency in graphs
+
+### Acknowledgements:
+While exploring this idea I ran into https://zwischenzugs.com/2017/12/18/project-management-as-code-with-graphviz/ which is a similar idea applied to more general project management.
