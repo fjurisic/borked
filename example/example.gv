@@ -1,0 +1,84 @@
+digraph Example {
+    label="Example Project";
+    labelloc=top;
+    // node_style data      shape=Mrecord;style=filled;fillcolor="#f64141" // lightred
+    // node_style model     shape=Mrecord;style=filled;fillcolor="#845321" // brownish
+    // node_style variant   shape=Mrecord;style=filled;fillcolor="#CD853F" // lightbrown
+    // node_style statistic shape=Mrecord;style=filled;fillcolor="lightblue"
+    // node_style resource  shape=Mrecord;style=filled;fillcolor="#556B2F" // olive
+
+
+    node [shape=Mrecord;style=filled;fillcolor="#f64141"]; // data
+    mnist [label="{MNIST|" +
+                 "{{loc|train|test}|" +
+                 "{http://yann.lecun.com/exdb/mnist/" +
+                 "|DATADIR/mnist_train.txt" +           // contains paths to individual samples
+                 "|DATADIR/mnist_test.txt}}}"
+                 ];
+
+    mnist_removeclass [label="{Remove class \"1\" from train|" +
+                             "DATADIR/mnist_train_without1.txt}"
+                             ];
+    mnist -> mnist_removeclass;
+
+    extra_samples [label="{Extra samples in MNIST format|" +
+                         "{loc|NETWORKDRIVE/datasets/example_project/mnist_extra.zip}" +
+                         "|DATADIR/extra_mnist.txt}"
+                         ];
+    combined1 [label="{Combined train|DATADIR/train_01.txt}"];
+    {mnist_removeclass;extra_samples} -> combined1;
+
+    preprocessed [label="{Preprocessed samples|" +
+                        "{args|--center --scale 0.15}|" +
+                        "DATADIR/train_preproc01.txt|DATADIR/test_preproc01.txt}"];
+
+    node [shape=Mrecord;style=filled;fillcolor="#845321"]; // model
+
+    neural_network [label="{Fully connected neural network|" +
+                          "{layers| 784,256,128,10}|ReLU}"
+                          ];
+
+    covnet [label="{Convolutional neural network|" +
+                  "{layers|" +
+                  "{784|conv 64 3x3, step 1, ReLU|maxpool 3x3, step 3|" +
+                  "fc 256, sigmoid, dropout 0.5|fc 10}}" +
+                  "|{optimizer|ADAM lr 0.001}" +
+                  "}"];
+
+    optimizer [label="{SGD|lr 0.01|epochs 100}"];
+
+
+    node [shape=Mrecord;style=filled;fillcolor="lightblue"]; // statistic
+    fc_sgd_stat [label="{Fully connected SGD|{{train|test}|{99.9%|94.3%}}}"];
+    {neural_network;optimizer;combined1} -> fc_sgd_stat;
+
+    cnn_adam_stat [label="{ConvNet|{{train|test}|{99.9%|94.7%}}}"];
+    {covnet;combined1} -> cnn_adam_stat;
+
+    cnn_relu_stat [label="{train|test}|{99.9%|95.4%}"];
+
+    cnn_preproc_stat [label="{trained/tested on preprocessed samples|" +
+                            "{{train|test}|{99.9%|99.6%}}}"];
+
+    node [shape=Mrecord;style=filled;fillcolor="#CD853F"]; // variant
+
+    change_activation [label="{Change sigmoid to ReLU|random seed: 42}"];
+    {covnet;combined1} -> change_activation;
+
+    node [shape=Mrecord;style=filled;fillcolor="#556B2F"]; // resource
+
+    covnet_model [label="{CovNet|{{jupyter notebook|weights}|" +
+                        "{github.local:org/example_project/covnet.ipynb (bc6e83)|" +
+                        "DATADIR/weights/convnet1.w}}}"];
+    {change_activation} -> covnet_model;
+    covnet_model -> cnn_relu_stat;
+
+    preprocessing [label="{Image preprocessor|github.local:org/example_project/tools/preprocess.py (6c10de)}"];
+    {preprocessing;combined1} -> preprocessed;
+    preproc_weights [label="{trained on preprocessed samples using notebook|" +
+                           "{weights|DATADIR/weights/cnn_preproc01.w}}"];
+    {preprocessed;covnet_model} -> preproc_weights;
+    preproc_weights -> cnn_preproc_stat;
+
+}
+
